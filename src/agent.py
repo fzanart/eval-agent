@@ -97,12 +97,15 @@ class Agent:
             HumanMessage(content=self.templates["followup"])
         ]
         result = self.model.invoke(messages).content
+        result = self.clean_resposnse(result)
 
-        yes_ratio = difflib.SequenceMatcher(None, result.lower(), "yes").ratio()
-        no_ratio = difflib.SequenceMatcher(None, result.lower(), "no").ratio()
-        logger.info(
-            "\tResult: %s, yes ratio: %f, no ratio: %f", result, yes_ratio, no_ratio
-        )
+        yes_ratio = difflib.SequenceMatcher(None, result, "yes").ratio()
+        no_ratio = difflib.SequenceMatcher(None, result, "no").ratio()
+
+        logger.info("\tResult: %s", result)
+        logger.info("\tyes ratio: %f", yes_ratio)
+        logger.info("\tno ratio: %f", no_ratio)
+
         if yes_ratio > no_ratio:
             self.state["messages"].append(AIMessage(content=result))
             return "yes"
@@ -124,11 +127,13 @@ class Agent:
             HumanMessage(content=self.templates["accuracy_decision"])
         ]
         accuracy_result = self.model.invoke(messages).content
+        accuracy_result = self.clean_resposnse(accuracy_result)
 
         messages = self.state["messages"] + [
             HumanMessage(content=self.templates["relevance_decision"])
         ]
         relevance_result = self.model.invoke(messages).content
+        relevance_result = self.clean_resposnse(relevance_result)
 
         return {"accuracy": accuracy_result, "relevance": relevance_result}
 
@@ -157,3 +162,8 @@ class Agent:
         result = self.decision_node()
 
         return result
+
+    def cleanup_resposnse(self, response):
+        response = response.lower()
+        cleaned_response = response.replace("<term>", "").replace("</term>", "").strip()
+        return cleaned_response
