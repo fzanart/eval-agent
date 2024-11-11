@@ -97,7 +97,7 @@ class Agent:
             HumanMessage(content=self.templates["followup"])
         ]
         result = self.model.invoke(messages).content
-        result = self.clean_resposnse(result)
+        result = self.cleanup_resposnse(result)
 
         yes_ratio = difflib.SequenceMatcher(None, result, "yes").ratio()
         no_ratio = difflib.SequenceMatcher(None, result, "no").ratio()
@@ -127,13 +127,13 @@ class Agent:
             HumanMessage(content=self.templates["accuracy_decision"])
         ]
         accuracy_result = self.model.invoke(messages).content
-        accuracy_result = self.clean_resposnse(accuracy_result)
+        accuracy_result = self.cleanup_resposnse(accuracy_result)
 
         messages = self.state["messages"] + [
             HumanMessage(content=self.templates["relevance_decision"])
         ]
         relevance_result = self.model.invoke(messages).content
-        relevance_result = self.clean_resposnse(relevance_result)
+        relevance_result = self.cleanup_resposnse(relevance_result)
 
         return {"accuracy": accuracy_result, "relevance": relevance_result}
 
