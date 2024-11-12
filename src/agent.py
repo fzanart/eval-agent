@@ -8,7 +8,7 @@ import yaml
 from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import AIMessage, SystemMessage, HumanMessage
 from langchain_core.runnables import RunnableParallel
-from .templates import (
+from templates.agent_prompts import (
     SETUP,
     INPUT,
     ANSWERS,
