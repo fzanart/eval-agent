@@ -2,35 +2,29 @@
 this file contains templates for the different types of prompts
 """
 
-INPUT = "<claim>\n\t{claim} \n</claim>\n<fact>\n\t{fact}\n</fact>"
-
-BAD_SAMPLE = (
-    "You are a synthetic data generator. You will be given a claim along with a fact "
-    "that is relevant and accurate to debunk this claim.\n"
-    "Your task is to generate a deliberately irrelevant and inaccurate fact that fails "
-    "to address the claim.\n"
-    "This fact should be clearly distinguishable as inappropriate for fact-checking "
-    "purposes.\n"
-    "Limit your answer two sentences or less than 30 words, enclosed by <fact> and "
-    "</fact> delimiters."
+INNACURATE_BUT_RELEVANT = (
+    "You are a synthetic data generator. "
+    "You will be given a claim that is broadly related to climate change. "
+    "Your task is to generate a short statement that is inaccurate, "
+    "yet is related to the topic of the claim. Limit your answer two sentences or "
+    "less than 30 words, enclosed by <text> and </text> delimiters.\n"
+    "<claim>\n\t{claim} \n</claim>\n"
 )
 
-
-TOPICALLY_RELATED_SAMPLE = (
-    "You are a synthetic data generator. You will be given a claim along with a fact "
-    "that is relevant and accurate to debunk this claim.\n"
-    "Your task is to generate a deliberately irrelevant and inaccurate fact that fails "
-    "to address the claim, yet is related to the topic of the claim.\n"
-    "Limit your answer two sentences or less than 30 words, enclosed by <fact> and "
-    "</fact> delimiters."
+ACCURATE_BUT_IRRELEVANT = (
+    "You are a synthetic data generator. "
+    "You will be given a claim that is broadly related to climate change. "
+    "Your task is to generate an accurate fact about climate change, that is irrelevant "
+    "to the topic of the claim. Limit your answer two sentences or less than 30 words, "
+    "enclosed by <text> and </text> delimiters.\n"
+    "<claim>\n\t{claim} \n</claim>\n"
 )
 
-
-REASONABLE_SAMPLE = (
-    "You are a synthetic data generator. You will be given a claim along with a fact "
-    "that is relevant and accurate to debunk this claim.\n"
-    "Your task is to generate a fact that reasonably addresses the claim, though not "
-    "as effectively as the original fact.\n"
-    "Limit your answer two sentences or less than 30 words, enclosed by <fact> and "
-    "</fact> delimiters."
+INNACURATE_AND_IRRELEVANT = (
+    "You are a synthetic data generator. "
+    "You will be given a claim that is broadly related to climate change. "
+    "Your task is to generate a short statement that is inaccurate, and that is irrelevant "
+    "to the topic of the claim. Limit your answer two sentences or less than 30 words, "
+    "enclosed by <text> and </text> delimiters.\n"
+    "<claim>\n\t{claim} \n</claim>\n"
 )

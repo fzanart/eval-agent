@@ -12,12 +12,11 @@ import logging.config
 import yaml
 from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import SystemMessage, HumanMessage
-from .templates.zero_shot_prompts import ACCURACY_DECISION, RELEVANCE_DECISION, INPUT
+from .templates.zero_shot_prompts import ACCURACY_DECISION, RELEVANCE_DECISION
 
 TEMPLATES = {
     "accuracy": ACCURACY_DECISION,
     "relevance": RELEVANCE_DECISION,
-    "input": INPUT,
 }
 
 # Load logging configuration from YAML file
@@ -42,24 +41,18 @@ class ZeroShotAnalysis:
 
     def evaluate(self, evaluation):
 
-        messages = []
-
-        messages.append(SystemMessage(content=self.templates[evaluation]))
-
         prompt_template = PromptTemplate(
-            template=self.templates["input"],
+            template=self.templates[evaluation],
             input_variables=["claim", "fact"],
         )
-        messages.append(
-            HumanMessage(
-                content=prompt_template.invoke(
-                    {"claim": self.claim, "fact": self.fact}
-                ).text
-            )
+        message = HumanMessage(
+            content=prompt_template.invoke(
+                {"claim": self.claim, "fact": self.fact}
+            ).text
         )
 
-        result = self.model.invoke(messages)
-        result = self.cleanup_resposnse(result.content)
+        result = self.model.invoke(message)
+        result = self.cleanup_response(result.content)
         return result
 
     def analyze(self, claim, fact):
@@ -71,7 +64,7 @@ class ZeroShotAnalysis:
 
         return accuracy_decision, relevance_decision
 
-    def cleanup_resposnse(self, response):
+    def cleanup_response(self, response):
         response = response.lower()
         cleaned_response = response.replace("<term>", "").replace("</term>", "").strip()
         return cleaned_response

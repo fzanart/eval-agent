@@ -1,17 +1,15 @@
 from langchain_core.prompts import PromptTemplate
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import HumanMessage
 from .templates.synthetic_data_pompts import (
-    BAD_SAMPLE,
-    TOPICALLY_RELATED_SAMPLE,
-    REASONABLE_SAMPLE,
-    INPUT,
+    INNACURATE_BUT_RELEVANT,
+    ACCURATE_BUT_IRRELEVANT,
+    INNACURATE_AND_IRRELEVANT,
 )
 
 TEMPLATES = {
-    "really_bad": BAD_SAMPLE,
-    "topically_related": TOPICALLY_RELATED_SAMPLE,
-    "reasonable": REASONABLE_SAMPLE,
-    "input": INPUT,
+    "innacurate_but_relevant": INNACURATE_BUT_RELEVANT,
+    "accurate_but_irrelevant": ACCURATE_BUT_IRRELEVANT,
+    "innacurate_and_irrelevant": INNACURATE_AND_IRRELEVANT,
 }
 
 
@@ -20,43 +18,37 @@ class SynteticSampleGenerator:
         # model init
         self.model = model
         self.claim = None
-        self.fact = None
         # system template prompts:
         if templates is None:
             templates = TEMPLATES
         self.templates = templates
 
-    def generate(self, claim, fact):
+    def generate(self, claim):
         self.claim = claim
-        self.fact = fact
         # generate prompts
-        really_bad = self.create_sample("really_bad")
-        really_bad_but_topically_related = self.create_sample("topically_related")
-        reasonable_but_not_as_good = self.create_sample("reasonable")
-        return really_bad, really_bad_but_topically_related, reasonable_but_not_as_good
+        innacurate_but_relevant = self.create_sample("innacurate_but_relevant")
+        accurate_but_irrelevant = self.create_sample("accurate_but_irrelevant")
+        innacurate_and_irrelevant = self.create_sample("innacurate_and_irrelevant")
+        return (
+            innacurate_but_relevant,
+            accurate_but_irrelevant,
+            innacurate_and_irrelevant,
+        )
 
     def create_sample(self, sample_type):
 
-        messages = []
-
-        messages.append(SystemMessage(content=self.templates[sample_type]))
-
         prompt_template = PromptTemplate(
-            template=self.templates["input"],
-            input_variables=["claim", "fact"],
+            template=self.templates[sample_type],
+            input_variables=["claim"],
         )
-        messages.append(
-            HumanMessage(
-                content=prompt_template.invoke(
-                    {"claim": self.claim, "fact": self.fact}
-                ).text
-            )
+        message = HumanMessage(
+            content=prompt_template.invoke({"claim": self.claim}).text
         )
 
-        result = self.model.invoke(messages)
-        result = self.cleanup_resposnse(result.content)
+        result = self.model.invoke(message)
+        result = self.cleanup_response(result.content)
         return result
 
-    def cleanup_resposnse(self, response):
-        cleaned_response = response.replace("<fact>", "").replace("</fact>", "").strip()
+    def cleanup_response(self, response):
+        cleaned_response = response.replace("<text>", "").replace("</text>", "").strip()
         return cleaned_response
