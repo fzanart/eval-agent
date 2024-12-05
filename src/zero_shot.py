@@ -11,7 +11,7 @@ import logging
 import logging.config
 import yaml
 from langchain_core.prompts import PromptTemplate
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import HumanMessage
 from .templates.zero_shot_prompts import ACCURACY_DECISION, RELEVANCE_DECISION
 
 TEMPLATES = {
@@ -51,7 +51,7 @@ class ZeroShotAnalysis:
             ).text
         )
 
-        result = self.model.invoke(message)
+        result = self.model.invoke([message])
         result = self.cleanup_response(result.content)
         return result
 
