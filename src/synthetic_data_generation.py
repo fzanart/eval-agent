@@ -1,3 +1,6 @@
+import logging
+import logging.config
+import yaml
 from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import HumanMessage
 from .templates.synthetic_data_pompts import (
@@ -5,6 +8,14 @@ from .templates.synthetic_data_pompts import (
     ACCURATE_BUT_IRRELEVANT,
     INNACURATE_AND_IRRELEVANT,
 )
+
+# Load logging configuration from YAML file
+with open("logging.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+# create logger
+logging.config.dictConfig(config)
+logger = logging.getLogger("app")
 
 TEMPLATES = {
     "innacurate_but_relevant": INNACURATE_BUT_RELEVANT,
@@ -44,8 +55,8 @@ class SynteticSampleGenerator:
         message = HumanMessage(
             content=prompt_template.invoke({"claim": self.claim}).text
         )
-
-        result = self.model.invoke(message)
+        logger.info(message)
+        result = self.model.invoke([message])
         result = self.cleanup_response(result.content)
         return result
 
