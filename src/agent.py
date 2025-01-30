@@ -84,8 +84,9 @@ class Agent:
 
             chain_name = f"answer{i+1}"
             chains_dict[chain_name] = prompt | self.model
-            runner = RunnableParallel(**chains_dict)
-            results = runner.invoke({"fact": self.fact})
+
+        runner = RunnableParallel(**chains_dict)
+        results = runner.invoke({"fact": self.fact})
 
         for question, answer in zip(questions, results.values()):
             self.state["messages"].append(AIMessage(content=question))
@@ -102,10 +103,6 @@ class Agent:
         yes_ratio = difflib.SequenceMatcher(None, result, "yes").ratio()
         no_ratio = difflib.SequenceMatcher(None, result, "no").ratio()
 
-        logger.info("\tResult: %s", result)
-        logger.info("\tyes ratio: %f", yes_ratio)
-        logger.info("\tno ratio: %f", no_ratio)
-
         if yes_ratio > no_ratio:
             self.state["messages"].append(AIMessage(content=result))
             return "yes"
@@ -117,27 +114,34 @@ class Agent:
             HumanMessage(content=self.templates["followup_questions"])
         )
         messages = self.state["messages"]
+        logger.info(
+            "\n".join([f"{i + 1} {message}" for i, message in enumerate(messages)])
+        )
         result = self.model.invoke(messages).content
 
         return result
 
-    def decision_node(self):
+    def decision_node(self, relevance_and_clean=True):
 
         messages = self.state["messages"] + [
             HumanMessage(content=self.templates["accuracy_decision"])
         ]
         accuracy_result = self.model.invoke(messages).content
-        accuracy_result = self.cleanup_response(accuracy_result)
 
-        messages = self.state["messages"] + [
-            HumanMessage(content=self.templates["relevance_decision"])
-        ]
-        relevance_result = self.model.invoke(messages).content
-        relevance_result = self.cleanup_response(relevance_result)
+        if relevance_and_clean:
+            messages = self.state["messages"] + [
+                HumanMessage(content=self.templates["relevance_decision"])
+            ]
+            relevance_result = self.model.invoke(messages).content
 
-        return {"accuracy": accuracy_result, "relevance": relevance_result}
+            accuracy_result = self.cleanup_response(accuracy_result)
+            relevance_result = self.cleanup_response(relevance_result)
 
-    def analyze(self, fact, claim, max_turns=5):
+            return {"accuracy": accuracy_result, "relevance": relevance_result}
+
+        return {"accuracy": accuracy_result.strip()}
+
+    def analyze(self, fact, claim, max_turns=5, decision_flag=True):
 
         self.claim = claim
         self.fact = fact
@@ -145,7 +149,6 @@ class Agent:
         logger.info("2. Fact: %s", fact)
 
         questions = self.setup_node()
-        logger.info("3. Answering questions...")
         self.answers_node(questions)
 
         answer = self.followup_node()
@@ -159,7 +162,8 @@ class Agent:
             answer = self.followup_node()
             turn += 1
 
-        result = self.decision_node()
+        relevance_and_clean = decision_flag
+        result = self.decision_node(relevance_and_clean=relevance_and_clean)
 
         return result
 

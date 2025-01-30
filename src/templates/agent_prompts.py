@@ -5,7 +5,7 @@ this file contains templates for the different types of prompts
 SETUP = (
     "You are an expert in evaluating the quality of a misinformation debunking. "
     "You will be given a claim, and a fact that attempts to debunk the claim.  "
-    "Specifically, you will assess whether the is accurate, and whether it is relevant "
+    "Specifically, you will assess whether the fact is accurate, and whether the fact is relevant "
     "to the claim. You will do this by generating short, "
     "targeted questions designed to verify the accuracy of the fact."
     "- Determine the fact's accuracy."
@@ -16,14 +16,7 @@ SETUP = (
     "Begin with the first questions."
 )
 
-INPUT = (
-    "<misisnformation>\n"
-    "\t{claim} \n"
-    "</misisnformation>\n"
-    "<fact>\n"
-    "\t{fact}\n"
-    "</fact>"
-)
+INPUT = "<claim>\n" "\t{claim} \n" "</claim>\n" "<fact>\n" "\t{fact}\n" "</fact>"
 
 ANSWERS = (
     "<instruction> "
@@ -82,4 +75,38 @@ RELEVANCE_DECISION = (
     "<term>\n"
     "\tNo\n"
     "</term>\n"
+)
+
+GENERATIVE_DEBUNKING_RUBRIC = (
+    "Evaluate how effectively the rebuttal counters the myth by providing a factual "
+    "alternative. Consider the following criteria:\n"
+    '- excellent: Includes a relevant, "sticky" fact that is accurate and free from '
+    'allacies. "Sticky" means it is simple, unexpected, credible, concrete, emotional, '
+    "or tells a story.\n"
+    '- good: Includes a relevant but "non-sticky" fact that is accurate and free '
+    "from fallacies.\n"
+    "- needs Improvement: Includes a fact that is inaccurate, irrelevant, or contains "
+    "a fallacy.\n"
+    "- inadequate: The explanation is nonsensical or lacks a relevant fact.\n"
+    "Please respond with one classification enclosed in angle brackets, e.g., <excellent>."
+)
+
+ACCURACY_DECISION_CURRENT_RUBTRIC = (
+    "Based on the answers to your questions, is the fact accurate? \n"
+    "Please respond with one of the following options: \n"
+    "- completely inaccurate\n"
+    "- mostly inaccurate\n"
+    "- mostly accurate\n"
+    "- completely accurate\n"
+    "Format your answer enclosed in angle brackets, e.g., <completely accurate>."
+)
+
+RELEVANCE_DECISION_CURRENT_RUBTRIC = (
+    "Based on the answers to your questions, is the fact relevant to the claim? \n"
+    "Please respond with one of the following options: \n"
+    "- completely irrelevant\n"
+    "- mostly irrelevant\n"
+    "- mostly relevant\n"
+    "- completely relevant\n"
+    "Format your answer enclosed in angle brackets, e.g., <completely relevant>."
 )

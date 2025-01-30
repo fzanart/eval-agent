@@ -55,14 +55,16 @@ class ZeroShotAnalysis:
         result = self.cleanup_response(result.content)
         return result
 
-    def analyze(self, claim, fact):
+    def analyze(self, claim, fact, decision_flag=True):
         self.claim = claim
         self.fact = fact
         # generate prompts
         accuracy_decision = self.evaluate("accuracy")
-        relevance_decision = self.evaluate("relevance")
+        if decision_flag:
+            relevance_decision = self.evaluate("relevance")
+            return accuracy_decision, relevance_decision
 
-        return accuracy_decision, relevance_decision
+        return accuracy_decision
 
     def cleanup_response(self, response):
         response = response.lower()
