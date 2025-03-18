@@ -164,4 +164,13 @@ cython_debug/
 /input
 /output
 /other
-/src/es.py
+/src
+/results
+/evals
+/app/input/
+app/test.ipynb
+app/test2.ipynb
+app/src/todo.txt
+app/automated_eval.xlsx
+app/automated_eval2.xlsx
+app/automated_eval3.xlsx
